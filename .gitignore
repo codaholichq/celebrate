@@ -1,0 +1,8 @@
+.DS_Store
+._*
+/node_modules
+client
+.env
+/.vscode
+/config/mailToken.js
+.prod.env
