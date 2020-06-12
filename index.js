@@ -43,8 +43,6 @@ if (ENV.NODE_ENV === 'production') {
 
 app.use(logger('dev'))
 
-
-
 http.createServer(app)
   .listen(ENV.PORT, () => {
     emailTask()

@@ -2,6 +2,7 @@
 ._*
 node_modules/
 package-lock.json
+package.json
 client
 *.env
 .vscode/
@@ -10,4 +11,5 @@ Dockerfile
 docker-compose.yml
 /data/init-mongo.js
 db
+demo.yml
 health-check.sh
