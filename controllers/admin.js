@@ -1,14 +1,15 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { Admin } from '../models/index.js'
-import { CONFIG } from '../config/index.js'
+
+const ENV = process.env
 
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
   if (typeof token === undefined) return res.sendStatus(401)
 
-  jwt.verify(token, CONFIG.JWT_SECRET, (err, user) => {
+  jwt.verify(token, ENV.JWT_SECRET, (err, user) => {
     if (err) {
       console.error(err.message)
       return res.sendStatus(403)
@@ -18,68 +19,67 @@ const verifyToken = (req, res, next) => {
   })
 }
 
-const login = (req, res) => {
+const login = async (req, res) => {
 
   const { email, password } = req.body
+  const admin = await Admin.findOne({ email })
 
-  Admin.findOne({ email }, (err, doc) => {
-    if (err) {
-      return res.json({ 'error': err })
-    }
+  if (!admin) {
+    return res.status(404).json({
+      message: 'Admin was not found!',
+      success: false
+    })
+  }
 
-    if (doc.length === 0) {
-      return res.status(400).json({
-        message: 'Admin was not found!',
+  try {
+    const { _id, fname, cell } = admin
+    const isPass = bcrypt.compare(password, admin.password)
+
+    if (!isPass) {
+      res.status(400).json({
+        message: 'Wrong email or password',
         success: false
       })
     }
 
-    const { _id, fname, cell } = doc
-    bcrypt.compare(password, doc.password, (err, result) => {
-      if (err) res.send(err.message)
-      if (!result) {
-        res.json({ message: 'Wrong username or password' })
-      }
+    const payload = { _id, fname, cell }
+    const options = { expiresIn: '1d', issuer: 'https://emmysteven.com' }
+    const secret = ENV.JWT_SECRET
+    const token = jwt.sign(payload, secret, options)
+    res.status(200).send({ auth: true, token })
 
-      const payload = { _id, fname, cell }
-      const options = { expiresIn: '1d', issuer: 'https://emmysteven.com' }
-      const secret = CONFIG.JWT_SECRET
-      const token = jwt.sign(payload, secret, options)
-
-      res.status(200).send({ auth: true, token })
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+      success: false
     })
-
-  })
+  }
 }
 
-const signup = (req, res) => {
+const signup = async (req, res) => {
+  let admin = await Admin.findOne({ email: req.body.email })
 
-  Admin.findOne({ email: req.body.email }, (err, doc) => {
-    if (err) {
-      return res.json({ 'error': err })
-    }
-    if (doc) {
-      return res.status(400).json({
-        message: 'Email is already taken',
-        success: false
-      })
-    }
-    const admin = new Admin({ ...req.body })
-    admin.save((err, doc) => {
-      if (err) {
-        return res.status(500).json({
-          message: "Unable to create your account, please try again later!",
-          success: false,
-          // error: err
-        })
-      }
-      return res.status(201).json({
-        message: doc.fname + ' was successfully registered!',
-        success: true
-      })
+  if (admin) {
+    res.status(201).json({
+      message: 'Email is already taken!',
+      success: false
     })
+  }
 
-  })
+  try {
+    admin = new Admin({ ...req.body })
+    await admin.save()
+    res.status(201).json({
+      message: 'Admin was added successfully!',
+      success: true
+    })
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+      success: false
+    })
+  }
+
 }
 
 const logout = function (req, res, next) {

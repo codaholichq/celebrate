@@ -2,7 +2,8 @@ import cron from 'node-cron'
 // import { sendMail } from './mail'
 import { User } from '../models/index.js'
 import { Util } from '../utils/index.js'
-import { CONFIG } from '../config/index.js'
+
+const ENV = process.env
 
 async function emailTask() {
   const result1 = User.countDocuments({ bornAt: Util.twoDaysMonth() })
@@ -17,7 +18,7 @@ async function emailTask() {
       doc.forEach(item => {
         console.log(item.firstname, item.lastname, 'was born on', item.bornAt)
         // sendMail({
-        //   from: CONFIG.EMAIL_ADDRESS,
+        //   from: ENV.EMAIL_ADDRESS,
         //   to: item.email,
         //   subject: 'Happy Birthday ' + item.firstname,
         //   html: '<div><p>Today a rare gem was born, we at RCNLagos celebrate you</p></div>'

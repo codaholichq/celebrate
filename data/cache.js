@@ -3,11 +3,10 @@ import redis from 'redis'
 import mongoose from 'mongoose'
 import { promisify } from 'util'
 import consola from 'consola'
-import { CONFIG } from '../config/index.js'
 
 const { success, error } = consola
 
-const client = redis.createClient(CONFIG.REDIS_URL)
+const client = redis.createClient(process.env.REDIS_URL)
   .on('connect', () => success({
     message: "App connected to Redis",
     badge: true

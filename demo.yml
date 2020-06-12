@@ -1,0 +1,13 @@
+mongo:
+    image: "bitnami/mongodb:4.2"
+    container_name: 'mongo'
+    restart: unless-stopped
+    environment:
+      - MONGODB_ROOT_PASSWORD=frenda4real555
+      - MONGODB_USERNAME=rcnlagos
+      - MONGODB_PASSWORD=frenda4real555
+      - MONGODB_DATABASE=rcnlagos
+    volumes:
+      - ./db/:/data/db/
+    ports:
+      - '27017:27017'
