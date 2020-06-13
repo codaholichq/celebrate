@@ -19,15 +19,15 @@ const dirName = dirname(mainPath.pathname)
 const METHODS = 'GET, POST, PUT, DELETE, OPTIONS'
 const HEADERS = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
 
-app.use((req, res, next) => {
-  const origin = `${req.protocol}://${req.headers.host}`
-  console.log(`Request Origin: ${origin}`)
-  res.header('Access-Control-Allow-Origin', ENV.ORIGIN)
-  res.header('Access-Control-Allow-Credentials', true)
-  res.header('Access-Control-Allow-Methods', METHODS)
-  res.header('Access-Control-Allow-Headers', HEADERS)
-  next()
-})
+// app.use((req, res, next) => {
+//   const origin = `${req.protocol}://${req.headers.host}`
+//   console.log(`Request Origin: ${origin}`)
+//   res.header('Access-Control-Allow-Origin', ENV.ORIGIN)
+//   res.header('Access-Control-Allow-Credentials', true)
+//   res.header('Access-Control-Allow-Methods', METHODS)
+//   res.header('Access-Control-Allow-Headers', HEADERS)
+//   next()
+// })
 
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
